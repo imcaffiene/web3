@@ -17,8 +17,7 @@ export const AirdropRequest = () => {
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
 
-  // 5 minutes in milliseconds
-  const COOLDOWN_DURATION = 5 * 60 * 1000; // 300,000 ms = 5 minutes
+  const COOLDOWN_DURATION = 5 * 60 * 1000;
 
   // Load airdrop count from localStorage when wallet changes
   useEffect(() => {
