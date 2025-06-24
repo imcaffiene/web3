@@ -42,7 +42,8 @@ const Headers = () => {
 
   return (
     <>
-      <header className="container mx-auto px-6 py-6" style={{ position: 'relative', zIndex: 9999 }}>
+      <header className="container mx-auto px-6 py-6"
+        style={{ position: 'relative', zIndex: 9999 }}>
         <nav className="flex items-center justify-between bg-gray-900 rounded-lg p-4 border border-gray-800" style={{ position: 'relative', zIndex: 9999 }}>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
@@ -129,3 +130,5 @@ const Headers = () => {
 };
 
 export default Headers;
+
+
