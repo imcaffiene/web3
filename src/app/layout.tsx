@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Headers from "@/components/models/Headers";
 import WalletWrapper from "@/components/models/WalletWrapper";
+import { Toaster } from "sonner";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -31,6 +32,13 @@ export default function RootLayout({
             <Headers />
             {children}
           </div>
+          {/* Toast notifications */}
+          <Toaster
+            position="bottom-right"
+            richColors
+            theme="dark"
+
+          />
         </WalletWrapper>
       </body>
     </html>

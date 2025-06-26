@@ -50,7 +50,7 @@ export const ShowBalance = () => {
         <Wallet className="w-4 h-4 text-gray-400" />
         <div>
           <span className="text-white text-lg font-bold">
-            {isLoading ? 'Loading...' : `Wallet Balance - ${balance?.toFixed(2) || '0.00'} SOL`}
+            {isLoading ? 'Loading...' : `Wallet Balance - ${balance?.toFixed(8) || '0.00'} SOL`}
           </span>
           {/* <div className="text-xs text-gray-400">
             ~${((balance || 0) * 100).toFixed(0)}
