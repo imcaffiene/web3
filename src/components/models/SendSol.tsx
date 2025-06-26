@@ -26,6 +26,12 @@ const SendSol = () => {
     }
   };
 
+  // Check if user is trying to send to themselves
+  const isSelfTransfer = (): boolean => {
+    if (!publicKey || !recipientAddress.trim()) return false;
+    return recipientAddress.trim() === publicKey.toBase58();
+  };
+
   const handleSendSol = async () => {
     if (!publicKey) {
       toast.error('Please connect your wallet first');
@@ -47,7 +53,8 @@ const SendSol = () => {
       return;
     }
 
-    if (recipientAddress.trim() === publicKey.toBase58()) {
+    // Check for self-transfer BEFORE setting loading state
+    if (isSelfTransfer()) {
       toast.error('Cannot send SOL to yourself');
       return;
     }
@@ -119,14 +126,12 @@ const SendSol = () => {
 
   const hasValidAddress = recipientAddress.trim().length > 0 && validateAddress(recipientAddress.trim());
   const hasValidAmount = amount > 0;
-  const isValidForm = hasValidAddress && hasValidAmount && !isLoading;
+  const notSelfTransfer = !isSelfTransfer(); // Add this validation
+  const isValidForm = hasValidAddress && hasValidAmount && notSelfTransfer && !isLoading;
 
   if (!publicKey) {
     return (
-      <section
-        className="container mx-auto px-6 py-10"
-        style={{ position: 'relative', zIndex: 1 }}
-      >
+      <section className="container mx-auto px-6 py-10 relative z-[1]">
         <Card className="bg-gray-900 border border-gray-800 max-w-md mx-auto">
           <CardContent className="text-center py-10">
             <Wallet className="w-8 h-8 text-gray-400 mx-auto mb-3" />
@@ -139,14 +144,8 @@ const SendSol = () => {
   }
 
   return (
-    <section
-      className="container mx-auto px-6 py-10"
-      style={{ position: 'relative', zIndex: 1 }}
-    >
-      <Card
-        className="bg-gray-900 border border-gray-800 max-w-md mx-auto"
-        style={{ position: 'relative', zIndex: 2 }}
-      >
+    <section className="container mx-auto px-6 py-10 relative z-[1]">
+      <Card className="bg-gray-900 border border-gray-800 max-w-md mx-auto relative z-[2]">
         <CardHeader className="text-center pb-4">
           <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-3 mx-auto">
             <Send className="w-6 h-6 text-white" />
@@ -159,10 +158,7 @@ const SendSol = () => {
           </p>
         </CardHeader>
 
-        <CardContent
-          className="space-y-4"
-          style={{ position: 'relative', zIndex: 3 }}
-        >
+        <CardContent className="space-y-4 relative z-[3]">
           {/* Recipient Address */}
           <div className="space-y-2">
             <label className="text-white text-sm font-medium">
@@ -176,33 +172,27 @@ const SendSol = () => {
               }}
               placeholder="Enter wallet address (e.g., 7xKX...)"
               disabled={isLoading}
-              style={{
-                width: '100%',
-                backgroundColor: isLoading ? '#111827' : '#1F2937',
-                border: `1px solid ${recipientAddress.trim() && !validateAddress(recipientAddress.trim()) ? '#EF4444' : '#374151'}`,
-                color: isLoading ? '#6B7280' : 'white',
-                padding: '12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                cursor: isLoading ? 'not-allowed' : 'text',
-                zIndex: 10,
-                position: 'relative',
-                pointerEvents: isLoading ? 'none' : 'auto'
-              }}
-              onFocus={(e) => {
-                if (!isLoading) e.target.style.borderColor = '#10B981';
-              }}
-              onBlur={(e) => {
-                if (recipientAddress.trim() && !validateAddress(recipientAddress.trim())) {
-                  e.target.style.borderColor = '#EF4444';
-                } else {
-                  e.target.style.borderColor = '#374151';
+              className={`
+                w-full p-3 rounded-lg text-sm outline-none transition-colors relative z-10
+                ${isLoading
+                  ? 'bg-gray-900 text-gray-500 cursor-not-allowed pointer-events-none'
+                  : 'bg-gray-800 text-white cursor-text'
                 }
-              }}
+                ${recipientAddress.trim() && !validateAddress(recipientAddress.trim())
+                  ? 'border border-red-500'
+                  : 'border border-gray-700 focus:border-green-500'
+                }
+                ${isSelfTransfer()
+                  ? 'border-yellow-500'
+                  : ''
+                }
+              `}
             />
             {recipientAddress.trim() && !validateAddress(recipientAddress.trim()) && (
               <p className="text-red-400 text-xs">Invalid wallet address</p>
+            )}
+            {isSelfTransfer() && (
+              <p className="text-yellow-400 text-xs">Cannot send SOL to your own wallet</p>
             )}
           </div>
 
@@ -222,56 +212,33 @@ const SendSol = () => {
               step="0.001"
               placeholder="0.00"
               disabled={isLoading}
-              style={{
-                width: '100%',
-                backgroundColor: isLoading ? '#111827' : '#1F2937',
-                border: '1px solid #374151',
-                color: isLoading ? '#6B7280' : 'white',
-                padding: '12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                outline: 'none',
-                cursor: isLoading ? 'not-allowed' : 'text',
-                zIndex: 10,
-                position: 'relative',
-                pointerEvents: isLoading ? 'none' : 'auto'
-              }}
-              onFocus={(e) => { if (!isLoading) e.target.style.borderColor = '#10B981'; }}
-              onBlur={(e) => { e.target.style.borderColor = '#374151'; }}
+              className={`
+                w-full p-3 rounded-lg text-sm outline-none transition-colors relative z-10
+                border border-gray-700 focus:border-green-500
+                ${isLoading
+                  ? 'bg-gray-900 text-gray-500 cursor-not-allowed pointer-events-none'
+                  : 'bg-gray-800 text-white cursor-text'
+                }
+              `}
             />
           </div>
 
           {/* Send Button */}
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleSendSol();
-            }}
+            onClick={handleSendSol}
             disabled={!isValidForm}
-            style={{
-              width: '100%',
-              backgroundColor: !isValidForm ? '#4B5563' : '#10B981',
-              color: 'white',
-              padding: '12px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: !isValidForm ? 'not-allowed' : 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              opacity: !isValidForm ? 0.6 : 1,
-              transition: 'all 0.2s ease',
-              zIndex: 100,
-              position: 'relative',
-              pointerEvents: 'auto'
-            }}
+            className={`
+              w-full p-3 rounded-lg border-none text-white font-semibold text-base
+              flex items-center justify-center gap-2 transition-all duration-200
+              relative z-[100]
+              ${!isValidForm
+                ? 'bg-gray-600 cursor-not-allowed opacity-60'
+                : 'bg-green-600 hover:bg-green-700 cursor-pointer'
+              }
+            `}
           >
-            <Send style={{ width: '16px', height: '16px' }} />
+            <Send className="w-4 h-4" />
             {isLoading ? 'Sending...' : `Send ${amount || 0} SOL`}
           </button>
         </CardContent>
