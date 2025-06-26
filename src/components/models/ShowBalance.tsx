@@ -2,7 +2,7 @@
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Wallet, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,7 +13,7 @@ export const ShowBalance = () => {
   const { connection } = useConnection();
   const { publicKey, connected } = useWallet();
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!publicKey) {
       toast.error('Wallet not connected');
       return;
@@ -32,7 +32,7 @@ export const ShowBalance = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [connection, publicKey]);
 
   useEffect(() => {
     if (connected && publicKey) {
@@ -40,7 +40,7 @@ export const ShowBalance = () => {
     } else {
       setBalance(null);
     }
-  }, [connected, publicKey]);
+  }, [connected, publicKey, fetchBalance]);
 
   if (!connected) return null;
 
@@ -61,17 +61,7 @@ export const ShowBalance = () => {
       <button
         onClick={fetchBalance}
         disabled={isLoading}
-        style={{
-          backgroundColor: '#374151',
-          border: 'none',
-          padding: '6px',
-          borderRadius: '4px',
-          color: 'white',
-          cursor: isLoading ? 'not-allowed' : 'pointer',
-          pointerEvents: 'auto',
-          zIndex: 9999,
-          position: 'relative'
-        }}
+        className="bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700 disabled:cursor-not-allowed border-none p-1.5 rounded text-white cursor-pointer pointer-events-auto relative z-[9999] transition-colors"
       >
         <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
       </button>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Send, Wallet, ArrowRight } from 'lucide-react';
+import { Send, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SendSol = () => {
@@ -21,12 +21,12 @@ const SendSol = () => {
       new PublicKey(address.trim());
       return true;
     } catch (error) {
+      console.error('Invalid address:', error);
       return false;
     }
   };
 
   const handleSendSol = async () => {
-
     if (!publicKey) {
       toast.error('Please connect your wallet first');
       return;
@@ -78,11 +78,6 @@ const SendSol = () => {
       // Create transaction
       const transaction = new Transaction().add(transferInstruction);
 
-      // Get recent blockhash
-      // const { blockhash } = await connection.getLatestBlockhash();
-      // transaction.recentBlockhash = blockhash;
-      // transaction.feePayer = publicKey;
-
       // Send transaction
       const signature = await sendTransaction(transaction, connection);
 
@@ -101,14 +96,20 @@ const SendSol = () => {
 
       console.log('Transaction signature:', signature);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Send transaction failed:', error);
 
-      if (error.message?.includes('insufficient funds')) {
-        toast.error('Insufficient funds for transaction');
-      } else if (error.message?.includes('User rejected')) {
-        toast.error('Transaction cancelled by user');
+      // Type-safe error handling
+      if (error instanceof Error) {
+        if (error.message?.includes('insufficient funds')) {
+          toast.error('Insufficient funds for transaction');
+        } else if (error.message?.includes('User rejected')) {
+          toast.error('Transaction cancelled by user');
+        } else {
+          toast.error('Transaction failed. Please try again.');
+        }
       } else {
+        // Handle non-Error objects
         toast.error('Transaction failed. Please try again.');
       }
     } finally {
@@ -248,7 +249,6 @@ const SendSol = () => {
               e.stopPropagation();
               handleSendSol();
             }}
-
             disabled={!isValidForm}
             style={{
               width: '100%',
@@ -268,13 +268,12 @@ const SendSol = () => {
               transition: 'all 0.2s ease',
               zIndex: 100,
               position: 'relative',
-              pointerEvents: 'auto' // Always allow pointer events for debugging
+              pointerEvents: 'auto'
             }}
           >
             <Send style={{ width: '16px', height: '16px' }} />
             {isLoading ? 'Sending...' : `Send ${amount || 0} SOL`}
           </button>
-
         </CardContent>
       </Card>
     </section>

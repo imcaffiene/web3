@@ -14,7 +14,7 @@ export const AirdropRequest = () => {
   const [cooldownTime, setCooldownTime] = useState<number>(0);
   const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
 
-  const { publicKey, connected } = useWallet();
+  const { publicKey } = useWallet();
   const { connection } = useConnection();
 
   const COOLDOWN_DURATION = 5 * 60 * 1000;

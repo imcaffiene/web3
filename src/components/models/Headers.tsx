@@ -18,8 +18,7 @@ const Headers = () => {
 
   const walletAddress = publicKey?.toBase58() || '';
 
-  const copyAddress = (e: React.MouseEvent) => {
-    console.log('Copy button clicked - handler called');
+  const copyAddress = () => {
     try {
       navigator.clipboard.writeText(walletAddress);
       toast.success('Wallet address copied to clipboard!');
@@ -29,8 +28,7 @@ const Headers = () => {
     }
   };
 
-  const handleDisconnect = (e: React.MouseEvent) => {
-    console.log('Disconnect button clicked - handler called');
+  const handleDisconnect = () => {
     try {
       disconnect();
       toast.success('Wallet disconnected');
@@ -130,5 +128,4 @@ const Headers = () => {
 };
 
 export default Headers;
-
 

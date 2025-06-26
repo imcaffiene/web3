@@ -1,9 +1,8 @@
 import { Zap } from 'lucide-react';
 import React from 'react';
 
-type Props = {};
 
-const Footer = (props: Props) => {
+const Footer = () => {
   return (
     <div>
       <footer className="container mx-auto px-6 py-16 border-t border-gray-800">
