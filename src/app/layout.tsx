@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Headers from "@/components/models/Headers";
-import WalletWrapper from "@/components/models/WalletWrapper";
+import Headers from "@/components/models/common/Headers";
+import WalletWrapper from "@/components/models/common/WalletWrapper";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/lib/theme-provider";
 
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Solana Airdrop",
+  title: "Piece of Eight",
   description: "Claim and send SOL tokens",
 };
 
@@ -19,28 +21,46 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <WalletWrapper>
-          <div className="min-h-screen w-full bg-[#020617] relative">
-            <div
-              className="absolute inset-0 z-0"
-              style={{
-                backgroundImage: `radial-gradient(circle 500px at 50% 300px, rgba(16,185,129,0.35), transparent)`,
-              }}
-            />
-            <Headers />
-            {children}
-          </div>
-          {/* Toast notifications */}
-          <Toaster
-            position="bottom-right"
-            richColors
-            theme="dark"
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
 
-          />
-        </WalletWrapper>
+          <WalletWrapper>
+            <div className="min-h-screen w-full bg-black relative">
+              <div
+                className="absolute inset-0 z-0"
+                style={{
+                  background: "#000000",
+                  backgroundImage: `
+                  radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.2) 1px, transparent 0),
+                  radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.18) 1px, transparent 0),
+                  radial-gradient(circle at 1px 1px, rgba(236, 72, 153, 0.15) 1px, transparent 0)
+                 `,
+                  backgroundSize: "20px 20px, 30px 30px, 25px 25px",
+                  backgroundPosition: "0 0, 10px 10px, 15px 5px",
+                }}
+              />
+
+              <Headers />
+              {children}
+            </div>
+            {/* <Analytics /> */}
+
+            <Toaster
+              richColors
+              theme="dark"
+            />
+          </WalletWrapper>
+        </ThemeProvider>
+
       </body>
     </html>
   );
 }
+
+
